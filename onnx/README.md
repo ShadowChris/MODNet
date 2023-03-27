@@ -18,13 +18,13 @@ To export the ONNX version of MODNet (assuming you are currently in project root
     ```shell
     python -m onnx.export_onnx \
         --ckpt-path=pretrained/modnet_photographic_portrait_matting.ckpt \
-        --output-path=pretrained/modnet_photographic_portrait_matting.onnx
+        --mask-path=pretrained/modnet_photographic_portrait_matting.onnx
     ```
 
 4. Inference the ONNX model by:
     ```shell
     python -m onnx.inference_onnx \
         --image-path=$FILENAME_OF_INPUT_IMAGE$ \
-        --output-path=$FILENAME_OF_OUTPUT_MATTE$ \
+        --mask-path=$FILENAME_OF_OUTPUT_MATTE$ \
         --model-path=pretrained/modnet_photographic_portrait_matting.onnx
     ```

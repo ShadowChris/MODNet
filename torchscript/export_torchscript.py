@@ -3,12 +3,12 @@ Export TorchScript model of MODNet
 
 Arguments:
     --ckpt-path: path of the checkpoint that will be converted
-    --output-path: path for saving the TorchScript model
+    --mask-path: path for saving the TorchScript model
 
 Example:
     python export_torchscript.py \
         --ckpt-path=modnet_photographic_portrait_matting.ckpt \
-        --output-path=modnet_photographic_portrait_matting.torchscript
+        --mask-path=modnet_photographic_portrait_matting.torchscript
 """
 
 import os
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # define cmd arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--ckpt-path', type=str, required=True, help='path of the checkpoint that will be converted')
-    parser.add_argument('--output-path', type=str, required=True, help='path for saving the TorchScript model')
+    parser.add_argument('--mask-path', type=str, required=True, help='path for saving the TorchScript model')
     args = parser.parse_args()
 
     # check input arguments
