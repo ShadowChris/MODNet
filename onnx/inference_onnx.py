@@ -3,12 +3,12 @@ Inference ONNX model of MODNet
 
 Arguments:
     --image-path: path of the input image (a file)
-    --output-path: path for saving the predicted alpha matte (a file)
+    --mask-path: path for saving the predicted alpha matte (a file)
     --model-path: path of the ONNX model
 
 Example:
 python inference_onnx.py \
-    --image-path=demo.jpg --output-path=matte.png --model-path=modnet.onnx
+    --image-path=demo.jpg --mask-path=matte.png --model-path=modnet.onnx
 """
 
 import os
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # define cmd arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--image-path', type=str, help='path of the input image (a file)')
-    parser.add_argument('--output-path', type=str, help='paht for saving the predicted alpha matte (a file)')
+    parser.add_argument('--mask-path', type=str, help='paht for saving the predicted alpha matte (a file)')
     parser.add_argument('--model-path', type=str, help='path of the ONNX model')
     args = parser.parse_args()
 

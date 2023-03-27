@@ -14,5 +14,5 @@ To export the TorchScript version of MODNet (assuming you are currently in proje
     ```shell
     python -m torchscript.export_torchscript \
         --ckpt-path=pretrained/modnet_photographic_portrait_matting.ckpt \
-        --output-path=pretrained/modnet_photographic_portrait_matting.torchscript
+        --mask-path=pretrained/modnet_photographic_portrait_matting.torchscript
     ```
