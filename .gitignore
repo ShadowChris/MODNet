@@ -101,3 +101,5 @@ data/history/*
 # data/input/*
 data/mask/*
 # data/output/*
+
+.idea
