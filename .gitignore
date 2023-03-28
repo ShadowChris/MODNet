@@ -103,3 +103,5 @@ data/mask/*
 # data/output/*
 
 .idea
+
+datasets
