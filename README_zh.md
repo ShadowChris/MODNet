@@ -7,3 +7,10 @@
 训练模型：
 1. workspace/portrait/230328-train.ipynb
 2. 运行所有cell，得到训练结果
+
+训练代码参考:
+https://github.com/ZHKKKe/MODNet/issues/200
+https://www.kaggle.com/code/daggerx/modnet/notebook
+
+预训练模型:
+https://drive.google.com/drive/folders/1umYmlCulvIFNaqPjwod1SayFmSRHziyR
