@@ -98,9 +98,9 @@ ENV/
 
 # history: 用来装历史图片的文件夹
 data/history/*
-# data/input/*
+data/input/*
 data/mask/*
-# data/output/*
+data/output/*
 
 .idea
 datasets/*
