@@ -38,7 +38,7 @@ logger = logging.getLogger()
 
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter(log_format))
-logger.addHandler(console_handler)
+# logger.addHandler(console_handler)
 
 
 def cv2_imshow(image):
@@ -251,8 +251,10 @@ for epoch in range(0, epochs):
     avg_matte_losses.append(avg_matte_loss)
     avg_total_losses.append(avg_total_loss)
 
-    logger.info(
-        f"Epoch {epoch + 1}/{epochs}, Avg Total Loss: {avg_total_loss:.4f}, Avg Semantic Loss: {avg_semantic_loss:.4f}, Avg Detail Loss: {avg_detail_loss:.4f}, Avg Matte Loss: {avg_matte_loss:.4f}, Time: {end_time - start_time:.2f}s")
+    epoch_description = f"Epoch {epoch + 1}/{epochs}, Avg Total Loss: {avg_total_loss:.4f}, Avg Semantic Loss: {avg_semantic_loss:.4f}, Avg Detail Loss: {avg_detail_loss:.4f}, Avg Matte Loss: {avg_matte_loss:.4f}, Time: {end_time - start_time:.2f}s"
+    logger.info(epoch_description)
+    print(epoch_description)
+
     lr_scheduler.step()
 
 # 在训练结束后绘制loss曲线
