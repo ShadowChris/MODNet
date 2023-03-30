@@ -141,3 +141,4 @@ if __name__ == '__main__':
             os.path.join(args.output_path, matte_name),
             mask=final_matte
         )
+        # print(matte.shape)

@@ -77,8 +77,8 @@ class ModNetDataLoader(Dataset):
     def __getitem__(self, idx):
         img_path = self.img_labels.iloc[idx, 0]
         mask_path = self.img_labels.iloc[idx, 1]
-        print(img_path)
-        print(mask_path)
+        # print(img_path)
+        # print(mask_path)
 
         img = np.asarray(Image.open(img_path))
 
@@ -184,6 +184,7 @@ optimizer = torch.optim.SGD(modnet.parameters(), lr=lr, momentum=0.9)
 lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
 
 for epoch in range(0, epochs):
+    print(f"Epoch {epoch + 1} Training: ")
     start_time = time.time()
     total_loss = 0
     batch_count = 0
@@ -194,7 +195,7 @@ for epoch in range(0, epochs):
         batch_count += 1
     end_time = time.time()
     avg_loss = total_loss / batch_count
-    print(f"Epoch {epoch+1}/{epochs}, Avg Loss: {avg_loss:.4f}, Time: {end_time - start_time:.2f}s")
+    print(f"Epoch {epoch+1}/{epochs}, Avg Loss: {avg_loss:.4f}, Semantic Loss: {semantic_loss:.4f}, Detail Loss: {detail_loss:.4f}, Matte Loss: {matte_loss:.4f}, Time: {end_time - start_time:.2f}s")
     lr_scheduler.step()
 
 torch.save(modnet.state_dict(), "pretrained/my_train/modnet.ckpt")
