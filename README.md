@@ -12,8 +12,8 @@ python -m workspace.portrait.get_foreground
 4. 可以通过命令行参数修改输入输出图片的路径，也可以到get_foreground.py内修改默认值
 
 # 2. 训练模型：
-1. workspace/portrait/230328-train.ipynb
-2. 运行所有cell，得到训练结果
+1. 运行workspace/portrait/train.py
+2. 训练完毕后，收敛曲线生成位置：doc/xxx.png
 
 训练代码参考:
 https://github.com/ZHKKKe/MODNet/issues/200

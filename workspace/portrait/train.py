@@ -14,11 +14,31 @@ from src.models.modnet import MODNet
 from src.trainer import supervised_training_iter
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import uuid
+import logging
 
 os.chdir("../..")
 print(os.getcwd())
-dataset_path = "datasets/mini_matting_human_half"
+# dataset_path = "datasets/mini_matting_human_half"
+dataset_path = "../datasets/matting_human_half"
 ckpt_path = "pretrained/modnet_photographic_portrait_matting.ckpt"
+
+# 生成唯一文件名
+uuid_str = uuid.uuid4().hex
+
+# 设置日志
+log_directory = "logs"
+if not os.path.exists(log_directory):
+    os.makedirs(log_directory)
+log_filename = f"training{uuid_str}.log"
+log_filepath = os.path.join(log_directory, log_filename)
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
+logging.basicConfig(level=logging.INFO, format=log_format, filename=log_filepath, filemode="w")
+logger = logging.getLogger()
+
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter(log_format))
+logger.addHandler(console_handler)
 
 
 def cv2_imshow(image):
@@ -28,6 +48,7 @@ def cv2_imshow(image):
     #  add below code
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 def cv2plt(img):
     plt.figure(figsize=(7, 7))  # To change the size of figure
@@ -159,7 +180,7 @@ transformer = transforms.Compose(
 )
 data = ModNetDataLoader(data_csv, 512, transform=transformer)
 
-img, trimap, mask = data[4]
+img, trimap, mask = data[0]
 # 打印图像、matte 和 trimap 的形状
 print("Image shape:", img.shape)
 print("Trimap shape:", trimap.shape)
@@ -169,13 +190,13 @@ print("Matte shape:", mask.shape)
 train_dataloader = DataLoader(data, batch_size=2, shuffle=True)
 
 bs = 2  # batch size
-lr = 0.01  # learn rate
-epochs = 1  # total epochs
-step_size = 1  # 学习率将在每 n 个 epoch 之后衰减，epochs < 4 用这行
-# step_size=int(0.25 * epochs) # epochs >= 4 用这行
+lr = 0.001  # learn rate
+epochs = 40  # total epochs
+# step_size = 1  # 学习率将在每 n 个 epoch 之后衰减，epochs < 4 用这行
+step_size = int(0.25 * epochs)  # epochs >= 4 用这行
 
-# modnet = torch.nn.DataParallel(MODNet()).cuda()
-modnet = torch.nn.DataParallel(MODNet(backbone_pretrained=True)).cuda()
+modnet = torch.nn.DataParallel(MODNet()).cuda()
+# modnet = torch.nn.DataParallel(MODNet(backbone_pretrained=True)).cuda()
 optimizer = torch.optim.SGD(modnet.parameters(), lr=lr, momentum=0.9)
 lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=0.1)
 
@@ -187,7 +208,7 @@ matte_losses = []
 total_losses = []
 
 for epoch in range(0, epochs):
-    print(f"Epoch {epoch + 1} Training: ")
+    logger.info(f"Epoch {epoch + 1} Training: ")
     start_time = time.time()
     total_loss = 0
     batch_count = 0
@@ -211,7 +232,7 @@ for epoch in range(0, epochs):
 
     end_time = time.time()
     avg_loss = total_loss / batch_count
-    print(f"Epoch {epoch + 1}/{epochs}, Avg Loss: {avg_loss:.4f}, Time: {end_time - start_time:.2f}s")
+    logger.info(f"Epoch {epoch + 1}/{epochs}, Avg Loss: {avg_loss:.4f}, Time: {end_time - start_time:.2f}s")
     lr_scheduler.step()
 
 # 在训练结束后绘制loss曲线
@@ -225,7 +246,9 @@ plt.ylabel('Loss')
 plt.legend()
 plt.title('Loss Convergence')
 
-plt.savefig('doc/loss_convergence.png')
+plt.savefig(f'doc/loss_convergence_{uuid_str}.png')
 plt.show()
 
-torch.save(modnet.state_dict(), "pretrained/my_train/modnet.ckpt")
+logger.info("Saving model...")
+torch.save(modnet.state_dict(), f"pretrained/my_train/modnet{uuid_str}.ckpt")
+logger.info(f"Model saved to pretrained/my_train/modnet{uuid_str}.ckpt")
