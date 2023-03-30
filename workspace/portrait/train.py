@@ -224,8 +224,8 @@ plt.xlabel('Iteration')
 plt.ylabel('Loss')
 plt.legend()
 plt.title('Loss Convergence')
-plt.show()
 
-plt.imsave('doc/loss_convergence.png')
+plt.savefig('doc/loss_convergence.png')
+plt.show()
 
 torch.save(modnet.state_dict(), "pretrained/my_train/modnet.ckpt")
