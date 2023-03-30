@@ -190,8 +190,8 @@ print("Matte shape:", mask.shape)
 train_dataloader = DataLoader(data, batch_size=2, shuffle=True)
 
 bs = 2  # batch size
-lr = 0.01  # learn rate
-epochs = 5  # total epochs
+lr = 0.001  # learn rate
+epochs = 10  # total epochs
 # step_size = 1  # 学习率将在每 n 个 epoch 之后衰减，epochs < 4 用这行
 step_size = int(0.25 * epochs)  # epochs >= 4 用这行
 
@@ -202,14 +202,19 @@ lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=step_size, g
 
 # ------------Training---------------
 # 创建空列表以保存每个loss的值
-semantic_losses = []
-detail_losses = []
-matte_losses = []
-avg_losses = []
+avg_semantic_losses = []
+avg_detail_losses = []
+avg_matte_losses = []
+avg_total_losses = []
 
 for epoch in range(0, epochs):
     logger.info(f"Epoch {epoch + 1} Training: ")
     start_time = time.time()
+
+    # 初始化损失值的总和和批次计数
+    total_semantic_losses = 0
+    total_detail_losses = 0
+    total_matte_losses = 0
     total_loss = 0
     batch_count = 0
 
@@ -217,13 +222,13 @@ for epoch in range(0, epochs):
     for idx, (image, trimap, gt_matte) in train_dataloader_progress:
         semantic_loss, detail_loss, matte_loss = \
             supervised_training_iter(modnet, optimizer, image.cuda(), trimap.cuda(), gt_matte.cuda())
+
+        # 累加损失值
+        total_semantic_losses += semantic_loss.item()
+        total_detail_losses += detail_loss.item()
+        total_matte_losses += matte_loss.item()
         total_loss += semantic_loss + detail_loss + matte_loss
         batch_count += 1
-
-        # 将每个loss值添加到相应的列表中
-        semantic_losses.append(semantic_loss.item())
-        detail_losses.append(detail_loss.item())
-        matte_losses.append(matte_loss.item())
 
         # 更新进度条信息
         progress_description = f"Batch {idx + 1}: Semantic Loss {semantic_loss:.4f}, Detail Loss {detail_loss:.4f}, Matte Loss {matte_loss:.4f}"
@@ -233,19 +238,29 @@ for epoch in range(0, epochs):
         logger.info(progress_description)
 
     end_time = time.time()
-    avg_loss = total_loss / batch_count
-    avg_losses.append(avg_loss)
 
-    logger.info(f"Epoch {epoch + 1}/{epochs}, Avg Loss: {avg_loss:.4f}, Time: {end_time - start_time:.2f}s")
+    # 计算平均损失值
+    avg_semantic_loss = total_semantic_losses / batch_count
+    avg_detail_loss = total_detail_losses / batch_count
+    avg_matte_loss = total_matte_losses / batch_count
+    avg_total_loss = total_loss / batch_count
+
+    # 将每个平均损失值添加到相应的列表中
+    avg_semantic_losses.append(avg_semantic_loss)
+    avg_detail_losses.append(avg_detail_loss)
+    avg_matte_losses.append(avg_matte_loss)
+    avg_total_losses.append(avg_total_loss)
+
+    logger.info(
+        f"Epoch {epoch + 1}/{epochs}, Avg Total Loss: {avg_total_loss:.4f}, Avg Semantic Loss: {avg_semantic_loss:.4f}, Avg Detail Loss: {avg_detail_loss:.4f}, Avg Matte Loss: {avg_matte_loss:.4f}, Time: {end_time - start_time:.2f}s")
     lr_scheduler.step()
 
 # 在训练结束后绘制loss曲线
 plt.figure()
-plt.plot(semantic_losses, label='Semantic Loss')
-plt.plot(detail_losses, label='Detail Loss')
-plt.plot(matte_losses, label='Matte Loss')
-plt.plot(avg_losses, label='Avg Loss')
-# plt.plot(total_losses, label='Total Loss')
+plt.plot(avg_semantic_losses, label='Avg Semantic Loss')
+plt.plot(avg_detail_losses, label='Avg Detail Loss')
+plt.plot(avg_matte_losses, label='Avg Matte Loss')
+plt.plot(avg_total_losses, label='Avg Total Loss')
 plt.xlabel('Iteration')
 plt.ylabel('Loss')
 plt.legend()
