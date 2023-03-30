@@ -30,7 +30,7 @@ uuid_str = uuid.uuid4().hex
 log_directory = "logs"
 if not os.path.exists(log_directory):
     os.makedirs(log_directory)
-log_filename = f"training{uuid_str}.log"
+log_filename = f"{uuid_str}_training.log"
 log_filepath = os.path.join(log_directory, log_filename)
 log_format = "%(asctime)s - %(levelname)s - %(message)s"
 logging.basicConfig(level=logging.INFO, format=log_format, filename=log_filepath, filemode="w")
@@ -246,9 +246,9 @@ plt.ylabel('Loss')
 plt.legend()
 plt.title('Loss Convergence')
 
-plt.savefig(f'doc/loss_convergence_{uuid_str}.png')
+plt.savefig(f'logs/{uuid_str}_loss_convergence.png')
 plt.show()
 
 logger.info("Saving model...")
-torch.save(modnet.state_dict(), f"pretrained/my_train/modnet{uuid_str}.ckpt")
-logger.info(f"Model saved to pretrained/my_train/modnet{uuid_str}.ckpt")
+torch.save(modnet.state_dict(), f"pretrained/my_train/modnet_{uuid_str}.ckpt")
+logger.info(f"Model saved to pretrained/my_train/modnet_{uuid_str}.ckpt")
