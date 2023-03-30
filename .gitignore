@@ -105,3 +105,4 @@ data/output/*
 .idea
 datasets/*
 !.gitkeep
+logs/*

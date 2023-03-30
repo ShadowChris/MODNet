@@ -19,8 +19,8 @@ import logging
 
 os.chdir("../..")
 print(os.getcwd())
-# dataset_path = "datasets/mini_matting_human_half"
-dataset_path = "../datasets/matting_human_half"
+dataset_path = "datasets/mini_matting_human_half"
+# dataset_path = "../datasets/matting_human_half"
 ckpt_path = "pretrained/modnet_photographic_portrait_matting.ckpt"
 
 # 生成唯一文件名
@@ -190,8 +190,8 @@ print("Matte shape:", mask.shape)
 train_dataloader = DataLoader(data, batch_size=2, shuffle=True)
 
 bs = 2  # batch size
-lr = 0.001  # learn rate
-epochs = 40  # total epochs
+lr = 0.01  # learn rate
+epochs = 5  # total epochs
 # step_size = 1  # 学习率将在每 n 个 epoch 之后衰减，epochs < 4 用这行
 step_size = int(0.25 * epochs)  # epochs >= 4 用这行
 
@@ -205,7 +205,7 @@ lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=step_size, g
 semantic_losses = []
 detail_losses = []
 matte_losses = []
-total_losses = []
+avg_losses = []
 
 for epoch in range(0, epochs):
     logger.info(f"Epoch {epoch + 1} Training: ")
@@ -224,14 +224,18 @@ for epoch in range(0, epochs):
         semantic_losses.append(semantic_loss.item())
         detail_losses.append(detail_loss.item())
         matte_losses.append(matte_loss.item())
-        total_losses.append(total_loss.item())
 
         # 更新进度条信息
-        train_dataloader_progress.set_description(
-            f"Batch {idx + 1}: Semantic Loss {semantic_loss:.4f}, Detail Loss {detail_loss:.4f}, Matte Loss {matte_loss:.4f}")
+        progress_description = f"Batch {idx + 1}: Semantic Loss {semantic_loss:.4f}, Detail Loss {detail_loss:.4f}, Matte Loss {matte_loss:.4f}"
+        train_dataloader_progress.set_description(progress_description)
+
+        # 将进度条信息输入到日志文件中
+        logger.info(progress_description)
 
     end_time = time.time()
     avg_loss = total_loss / batch_count
+    avg_losses.append(avg_loss)
+
     logger.info(f"Epoch {epoch + 1}/{epochs}, Avg Loss: {avg_loss:.4f}, Time: {end_time - start_time:.2f}s")
     lr_scheduler.step()
 
@@ -240,6 +244,7 @@ plt.figure()
 plt.plot(semantic_losses, label='Semantic Loss')
 plt.plot(detail_losses, label='Detail Loss')
 plt.plot(matte_losses, label='Matte Loss')
+plt.plot(avg_losses, label='Avg Loss')
 # plt.plot(total_losses, label='Total Loss')
 plt.xlabel('Iteration')
 plt.ylabel('Loss')
