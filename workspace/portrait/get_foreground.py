@@ -13,10 +13,18 @@ from src.models.modnet import MODNet
 import cv2
 
 
-# 抠图（原图，mask图，输出前景图）
-def get_foreground(img_name, mask_name, output_name):
+# 抠图（原图，输出前景图，可以传入文件的mask，也可以读取已加载的mask）
+def get_foreground(img_name, output_name, mask_name=None, mask=None):
     img1 = cv2.imread(img_name)
-    img2 = cv2.imread(mask_name, cv2.IMREAD_GRAYSCALE)
+    img2 = None
+    if mask_name is not None:
+        img2 = cv2.imread(mask_name, cv2.IMREAD_GRAYSCALE)
+    elif mask is not None:
+        img2 = mask
+    else:
+        print("please input mask_name or mask.")
+        return
+
     h, w, c = img1.shape
     img3 = np.zeros((h, w, 4))
     img3[:, :, 0:3] = img1
@@ -78,6 +86,8 @@ if __name__ == '__main__':
     # inference images
     im_names = os.listdir(args.input_path)
     for im_name in im_names:
+        if im_name == ".gitkeep":
+            continue
         print('Process image: {0}'.format(im_name))
 
         # read image
@@ -123,10 +133,11 @@ if __name__ == '__main__':
         matte = F.interpolate(matte, size=(im_h, im_w), mode='area')
         matte = matte[0][0].data.cpu().numpy()
         matte_name = im_name.split('.')[0] + '.png'
-        Image.fromarray(((matte * 255).astype('uint8')), mode='L').save(os.path.join(args.mask_path, matte_name))
+        final_matte = Image.fromarray(((matte * 255).astype('uint8')), mode='L')
+        final_matte.save(os.path.join(args.mask_path, matte_name))
 
         get_foreground(
             os.path.join(args.input_path, im_name),
-            os.path.join(args.mask_path, matte_name),
-            os.path.join(args.output_path, matte_name)
+            os.path.join(args.output_path, matte_name),
+            mask=final_matte
         )

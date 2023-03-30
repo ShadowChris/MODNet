@@ -1,10 +1,13 @@
-运行抠图demo：
+# 1. 运行抠图demo：
 1. 把输入图片全放入data/input中
-2. 运行workspace/portrait/getForeground.ipynb
-   * 需要根据自己需求修改.ckpt模型路径
+2. 运行以下命令：
+````
+python -m workspace.portrait.get_foreground
+````
 3. data/output中会输出抠图前景
+4. 可以通过命令行参数修改输入输出图片的路径，也可以到get_foreground.py内修改默认值
 
-训练模型：
+# 2. 训练模型：
 1. workspace/portrait/230328-train.ipynb
 2. 运行所有cell，得到训练结果
 
